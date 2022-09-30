@@ -222,12 +222,28 @@ Content-Type: application/json;charset=UTF-8
 
 ## Robot framewok tests
 
-### Eclipse IDE setup
+### PyCharrm IDE setup
 This will be a sanity check app implemented in the main Ruby API project which will test the stability of the payment transaction gateway project, which is descibed how to set up above this section.
 
-Before reading this you need to confirm all of the above is running localy on your machine, then you can use Eclipse id v? with Python v? and robot-framework v? to run those test
+Before reading this you need to confirm all of the above is running localy on your machine
 
 next commit:
 TODO: describe steps and prerequisites below
+Manual checks - 
 TODO: extract the API auth to config
 TODO: framework skeleton
+
+Build with:
+javac 1.8.0_201
+Python 3.6.9
+pip 9.0.1 from /usr/lib/python3/dist-packages (python 3.6)
+Robot Framework 5.0.1 (Python 3.6.9 on linux)
+
+pip3 check robotframework
+pip3 install requests
+pip3 install robotframework-requests
+pip3 install -U robotframework-jsonlibrary
+pip3 install jsonpath_rw
+pip3 install jsonpath_rw_ext
+
+PyCharm Intellibot plugin(patched)
