@@ -6,6 +6,7 @@ Library    String
 
 *** Variables ***
 ${base_url}     http://localhost:3001
+${tx_id}
 
 *** Test Cases ***
 Smoke_api_response
@@ -56,8 +57,33 @@ Post_test_success
     ${json_response}    to json   ${response.content}
     ${response.status}=    get value from json    ${json_response}    $.status
 
+    ${tx_id}=    get value from json    ${json_response}    $.unique_id
+    set global variable    ${tx_id}
+
     #Validations
     should be equal    ${response.status[0]}    approved
+
+Post_test_void
+    ${auth}=    create list    codemonster    my5ecret-key2o2o
+    ${header}=      create dictionary    Content-Type=application/json;charset=utf-8
+    &{request}=    create dictionary    reference_id=${tx_id[0]}
+    ...    transaction_type=void
+
+    &{body}=    create dictionary    payment_transaction=&{request}
+    ${body_string}=    convert to string    ${body}
+    ${body_json}=   replace string    ${body_string}   '   "
+
+    create session  mysession   ${base_url}    auth=${auth}
+
+    ${response}=    POST On Session    mysession    /payment_transactions   data=${body_json}    headers=${header}
+
+    ${json_response}    to json   ${response.content}
+    ${response.status}=    get value from json    ${json_response}    $.status
+    ${response.message}=    get value from json    ${json_response}    $.message
+
+    #Validations
+    should be equal    ${response.status[0]}    approved
+    should be equal    ${response.message[0]}    Your transaction has been voided successfully
 
 Post_test_empty
     ${auth}=    create list    codemonster    my5ecret-key2o2o
