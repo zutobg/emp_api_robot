@@ -28,7 +28,7 @@ Smoke_api_response
     should contain    ${body}   UTC     #change to GMT for failure check - it fails as expected
     should be equal    ${content_type_value}    application/json; charset=utf-8
 
-Post_tests
+Post_test_success
     ${auth}=    create list    codemonster    my5ecret-key2o2o
     ${header}=      create dictionary    Content-Type=application/json;charset=utf-8
     &{request}=    create dictionary    card_number=4200000000000000
@@ -58,3 +58,100 @@ Post_tests
 
     #Validations
     should be equal    ${response.status[0]}    approved
+
+Post_test_empty
+    ${auth}=    create list    codemonster    my5ecret-key2o2o
+    ${header}=      create dictionary    Content-Type=application/json;charset=utf-8
+    &{request}=    create dictionary    card_number=${EMPTY}
+    ...    cvv=${EMPTY}
+    ...    expiration_date=${EMPTY}
+    ...    amount=${EMPTY}
+    ...    usage=${EMPTY}
+    ...    transaction_type=sale
+    ...    card_holder=${EMPTY}
+    ...    email=${EMPTY}
+    ...    address=${EMPTY}
+
+    &{body}=    create dictionary    payment_transaction=&{request}
+    ${body_string}=    convert to string    ${body}
+    ${body_json}=   replace string    ${body_string}   '   "
+
+    create session  mysession   ${base_url}    auth=${auth}
+
+    ${response}=    POST On Session    mysession    /payment_transactions   data=${body_json}    headers=${header}
+
+    #log to console    ${response.status_code}
+    log to console    ${response.status_code}
+    ${response_full}=    ${response}
+
+
+    ${json_response}    to json   ${response.content}
+#    ${response.status}=    get value from json    ${json_response}    $.status
+
+    #Validations
+#    should be equal    ${response.status[0]}    approved
+#Started POST "/payment_transactions" for 127.0.0.1 at 2022-10-03 23:02:09 +0300
+ #Processing by V1::PaymentTransactionsController#create as */*
+ #  Parameters: {"payment_transaction"=>{"card_number"=>"", "cvv"=>"", "expiration_date"=>"", "amount"=>"", "usage"=>"", "transaction_type"=>"sale", "card_holder"=>"", "email"=>"", "address"=>""}}
+ #  [1m[35m (0.1ms)[0m  [1m[36mbegin transaction[0m
+ #  [1m[35m (0.1ms)[0m  [1m[31mrollback transaction[0m
+ #Completed 422 Unprocessable Entity in 879ms (Views: 0.3ms | ActiveRecord: 0.2m
+
+Post_test_space
+#it turns out im only able to validate the error message and the status of the post response with the library im using
+# so i'll not be able to make diff test for every field and by automation i'll be able to just verify positive and
+#negative results and only find the reason info for the back end validation by log debugging it - which is fine
+    ${auth}=    create list    codemonster    my5ecret-key2o2o
+    ${header}=      create dictionary    Content-Type=application/json;charset=utf-8
+    &{request}=    create dictionary    card_number=${SPACE}
+    ...    cvv=${SPACE}
+    ...    expiration_date=${SPACE}
+    ...    amount=${SPACE}
+    ...    usage=${SPACE}
+    ...    transaction_type=sale
+    ...    card_holder=${SPACE}
+    ...    email=${SPACE}
+    ...    address=${SPACE}
+
+    &{body}=    create dictionary    payment_transaction=&{request}
+    ${body_string}=    convert to string    ${body}
+    ${body_json}=   replace string    ${body_string}   '   "
+
+    create session  mysession   ${base_url}    auth=${auth}
+
+    ${response}=    POST On Session    mysession    /payment_transactions   data=${body_json}    headers=${header}
+
+    #log to console    ${response.status_code}
+    log to console    ${response.content}
+
+
+    ${json_response}    to json   ${response.content}
+#    ${response.status}=    get value from json    ${json_response}    $.status
+
+Post_test_validation
+    ${auth}=    create list    codemonster    my5ecret-key2o2o
+    ${header}=      create dictionary    Content-Type=application/json;charset=utf-8
+    &{request}=    create dictionary    card_number=4200000000000000
+    ...    cvv=123
+    ...    expiration_date=13/2022
+    ...    amount=0
+    ...    usage=afdfdfd
+    ...    transaction_type=sale
+    ...    card_holder=sdfgfdg
+    ...    email=sdsdsd@rsdsd.bg
+    ...    address=sd
+
+    &{body}=    create dictionary    payment_transaction=&{request}
+    ${body_string}=    convert to string    ${body}
+    ${body_json}=   replace string    ${body_string}   '   "
+
+    create session  mysession   ${base_url}    auth=${auth}
+
+    ${response}=    POST On Session    mysession    /payment_transactions   data=${body_json}    headers=${header}
+
+    #log to console    ${response.status_code}
+    log to console    ${response.content}
+
+
+    ${json_response}    to json   ${response.content}
+#    ${response.status}=    get value from json    ${json_response}    $.status
