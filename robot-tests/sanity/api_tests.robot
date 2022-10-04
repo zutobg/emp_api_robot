@@ -47,7 +47,7 @@ Smoke_api_response_DELETE
     ${response_string}     convert to string    ${response}
     should contain    ${response_string}   404
 
-Post_test_success
+Post_test_sale_success
     [Tags]    Sanity
     ${header}=      create dictionary    Content-Type=application/json;charset=utf-8
 
@@ -70,7 +70,27 @@ Post_test_success
     #Validations
     should be equal    ${response.status[0]}    approved
 
-Post_test_void
+Post_test_sale_declined
+    [Tags]    Sanity
+    ${header}=      create dictionary    Content-Type=application/json;charset=utf-8
+
+    &{body}=    create dictionary    payment_transaction=&{payment_body_sale_declined}
+    ${body_string}=    convert to string    ${body}
+    ${body_json}=   replace string    ${body_string}   '   "
+
+    ${response}=    POST On Session    mysession    /payment_transactions   data=${body_json}    headers=${header}
+
+    #log to console    ${response.status_code}
+    #log to console    ${response.content}
+
+#Keyword 'RequestsLibrary.To Json' is deprecated. Please use ${resp.json()} instead. Have a look at the improved HTML output as pretty printing replacement.
+    ${json_response}    to json   ${response.content}
+    ${response.status}=    get value from json    ${json_response}    $.status
+
+    #Validations
+    should be equal    ${response.status[0]}    declined
+
+Post_test_void_success
     [Tags]    Sanity
     ${header}=      create dictionary    Content-Type=application/json;charset=utf-8
     &{request}=    create dictionary    reference_id=${tx_id[0]}
