@@ -90,6 +90,23 @@ Post_test_void
     should be equal    ${response.status[0]}    approved
     should be equal    ${response.message[0]}    Your transaction has been voided successfully
 
+Post_test_void_invalid
+    [Tags]    Sanity
+    ${header}=      create dictionary    Content-Type=application/json;charset=utf-8
+    &{request}=    create dictionary    reference_id=${tx_id_invalid_guid}
+    ...    transaction_type=void
+
+    &{body}=    create dictionary    payment_transaction=&{request}
+    ${body_string}=    convert to string    ${body}
+    ${body_json}=   replace string    ${body_string}   '   "
+
+    ${response}=    run keyword and ignore error    POST On Session    mysession    /payment_transactions   data=${body_json}    headers=${header}
+
+    ${response_string}     convert to string    ${response}
+
+    #Validations
+    #TODO not able to access the validation message when post returns 422 status but will handle it by looking into robot report and extracting info from there
+    should contain    ${response_string}   422
 Post_test_out_of_range
     [Tags]    Sanity
     ${header}=      create dictionary    Content-Type=application/json;charset=utf-8
@@ -99,7 +116,6 @@ Post_test_out_of_range
     ${body_json}=   replace string    ${body_string}   '   "
 
     ${response}=    run keyword and ignore error    POST On Session    mysession    /payment_transactions   data=${body_json}    headers=${header}
-
 
     ${response_string}     convert to string    ${response}
 
