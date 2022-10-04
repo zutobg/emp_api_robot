@@ -90,6 +90,22 @@ Post_test_void
     should be equal    ${response.status[0]}    approved
     should be equal    ${response.message[0]}    Your transaction has been voided successfully
 
+Post_test_out_of_range
+    [Tags]    Sanity
+    ${header}=      create dictionary    Content-Type=application/json;charset=utf-8
+
+    &{body}=    create dictionary    payment_transaction=&{payment_body_sale_500_error_value}
+    ${body_string}=    convert to string    ${body}
+    ${body_json}=   replace string    ${body_string}   '   "
+
+    ${response}=    run keyword and ignore error    POST On Session    mysession    /payment_transactions   data=${body_json}    headers=${header}
+
+
+    ${response_string}     convert to string    ${response}
+
+    #Validations
+    should contain    ${response_string}   500
+
 Post_test_empty
     [Tags]    Validation
     ${header}=      create dictionary    Content-Type=application/json;charset=utf-8
