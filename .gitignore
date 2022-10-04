@@ -37,3 +37,7 @@ config/environments/*.local.yml
 robot-tests/log.html
 robot-tests/output.xml
 robot-tests/report.html
+robot-tests/results/
+
+# Ignore Python files
+robot-tests/sanity/__pycache__/

@@ -4,13 +4,17 @@ Library    Collections
 Library    JSONLibrary
 Library    String
 
+Variables    vars.py
+
+Suite Setup    create session  mysession   ${base_url}    auth=${auth}
+
 *** Variables ***
-${base_url}     http://localhost:3001
+#used to pass approved transaction to void test
 ${tx_id}
 
 *** Test Cases ***
-Smoke_api_response
-    create session  mysession   ${base_url}
+Smoke_api_response_GET
+    [Tags]    Smoke
     ${response}=    GET On Session    mysession    /payment_transactions
 
 #    log to console    ${response.url}
@@ -29,24 +33,27 @@ Smoke_api_response
     should contain    ${body}   UTC     #change to GMT for failure check - it fails as expected
     should be equal    ${content_type_value}    application/json; charset=utf-8
 
-Post_test_success
-    ${auth}=    create list    codemonster    my5ecret-key2o2o
-    ${header}=      create dictionary    Content-Type=application/json;charset=utf-8
-    &{request}=    create dictionary    card_number=4200000000000000
-    ...    cvv=123
-    ...    expiration_date=13/20192
-    ...    amount=55
-    ...    usage=robot_finally_worked
-    ...    transaction_type=sale
-    ...    card_holder=dssdds
-    ...    email=pandaa@exadfdmple.com
-    ...    address=dfdf
+Smoke_api_response_PUT
+    [Tags]    Smoke
+    ${response}=    run keyword and ignore error    PUT On Session    mysession    /payment_transactions
 
-    &{body}=    create dictionary    payment_transaction=&{request}
+    ${response_string}     convert to string    ${response}
+    should contain    ${response_string}   404
+
+Smoke_api_response_DELETE
+    [Tags]    Smoke
+    ${response}=    run keyword and ignore error    DELETE On Session    mysession    /payment_transactions
+
+    ${response_string}     convert to string    ${response}
+    should contain    ${response_string}   404
+
+Post_test_success
+    [Tags]    Sanity
+    ${header}=      create dictionary    Content-Type=application/json;charset=utf-8
+
+    &{body}=    create dictionary    payment_transaction=&{payment_body_sale}
     ${body_string}=    convert to string    ${body}
     ${body_json}=   replace string    ${body_string}   '   "
-
-    create session  mysession   ${base_url}    auth=${auth}
 
     ${response}=    POST On Session    mysession    /payment_transactions   data=${body_json}    headers=${header}
 
@@ -64,7 +71,7 @@ Post_test_success
     should be equal    ${response.status[0]}    approved
 
 Post_test_void
-    ${auth}=    create list    codemonster    my5ecret-key2o2o
+    [Tags]    Sanity
     ${header}=      create dictionary    Content-Type=application/json;charset=utf-8
     &{request}=    create dictionary    reference_id=${tx_id[0]}
     ...    transaction_type=void
@@ -72,8 +79,6 @@ Post_test_void
     &{body}=    create dictionary    payment_transaction=&{request}
     ${body_string}=    convert to string    ${body}
     ${body_json}=   replace string    ${body_string}   '   "
-
-    create session  mysession   ${base_url}    auth=${auth}
 
     ${response}=    POST On Session    mysession    /payment_transactions   data=${body_json}    headers=${header}
 
@@ -86,7 +91,7 @@ Post_test_void
     should be equal    ${response.message[0]}    Your transaction has been voided successfully
 
 Post_test_empty
-    ${auth}=    create list    codemonster    my5ecret-key2o2o
+    [Tags]    Validation
     ${header}=      create dictionary    Content-Type=application/json;charset=utf-8
     &{request}=    create dictionary    card_number=${EMPTY}
     ...    cvv=${EMPTY}
@@ -102,27 +107,17 @@ Post_test_empty
     ${body_string}=    convert to string    ${body}
     ${body_json}=   replace string    ${body_string}   '   "
 
-    create session  mysession   ${base_url}    auth=${auth}
-
     ${response}=    run keyword and ignore error    POST On Session    mysession    /payment_transactions   data=${body_json}    headers=${header}
-
     ${response_string}     convert to string    ${response}
-    should contain    ${response_string}   422
 
     #Validations
-#    should be equal    ${response.status[0]}    approved
-#Started POST "/payment_transactions" for 127.0.0.1 at 2022-10-03 23:02:09 +0300
- #Processing by V1::PaymentTransactionsController#create as */*
- #  Parameters: {"payment_transaction"=>{"card_number"=>"", "cvv"=>"", "expiration_date"=>"", "amount"=>"", "usage"=>"", "transaction_type"=>"sale", "card_holder"=>"", "email"=>"", "address"=>""}}
- #  [1m[35m (0.1ms)[0m  [1m[36mbegin transaction[0m
- #  [1m[35m (0.1ms)[0m  [1m[31mrollback transaction[0m
- #Completed 422 Unprocessable Entity in 879ms (Views: 0.3ms | ActiveRecord: 0.2m
+    should contain    ${response_string}   422
 
 Post_test_space
+    [Tags]    Validation
 #it turns out im only able to validate the error message and the status of the post response with the library im using
 # so i'll not be able to make diff test for every field and by automation i'll be able to just verify positive and
 #negative results and only find the reason info for the back end validation by log debugging it - which is fine
-    ${auth}=    create list    codemonster    my5ecret-key2o2o
     ${header}=      create dictionary    Content-Type=application/json;charset=utf-8
     &{request}=    create dictionary    card_number=${SPACE}
     ...    cvv=${SPACE}
@@ -138,15 +133,13 @@ Post_test_space
     ${body_string}=    convert to string    ${body}
     ${body_json}=   replace string    ${body_string}   '   "
 
-    create session  mysession   ${base_url}    auth=${auth}
-
     ${response}=    run keyword and ignore error    POST On Session    mysession    /payment_transactions   data=${body_json}    headers=${header}
 
     ${response_string}     convert to string    ${response}
     should contain    ${response_string}   422
 
 Post_test_validation
-    ${auth}=    create list    codemonster    my5ecret-key2o2o
+    [Tags]    Validation
     ${header}=      create dictionary    Content-Type=application/json;charset=utf-8
     &{request}=    create dictionary    card_number=4200000000000000
     ...    cvv=123
@@ -161,8 +154,6 @@ Post_test_validation
     &{body}=    create dictionary    payment_transaction=&{request}
     ${body_string}=    convert to string    ${body}
     ${body_json}=   replace string    ${body_string}   '   "
-
-    create session  mysession   ${base_url}    auth=${auth}
 
     ${response}=    run keyword and ignore error    POST On Session    mysession    /payment_transactions   data=${body_json}    headers=${header}
 
