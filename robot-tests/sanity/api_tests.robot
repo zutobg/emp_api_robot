@@ -104,15 +104,10 @@ Post_test_empty
 
     create session  mysession   ${base_url}    auth=${auth}
 
-    ${response}=    POST On Session    mysession    /payment_transactions   data=${body_json}    headers=${header}
+    ${response}=    run keyword and ignore error    POST On Session    mysession    /payment_transactions   data=${body_json}    headers=${header}
 
-    #log to console    ${response.status_code}
-    log to console    ${response.status_code}
-    ${response_full}=    ${response}
-
-
-    ${json_response}    to json   ${response.content}
-#    ${response.status}=    get value from json    ${json_response}    $.status
+    ${response_string}     convert to string    ${response}
+    should contain    ${response_string}   422
 
     #Validations
 #    should be equal    ${response.status[0]}    approved
@@ -145,14 +140,10 @@ Post_test_space
 
     create session  mysession   ${base_url}    auth=${auth}
 
-    ${response}=    POST On Session    mysession    /payment_transactions   data=${body_json}    headers=${header}
+    ${response}=    run keyword and ignore error    POST On Session    mysession    /payment_transactions   data=${body_json}    headers=${header}
 
-    #log to console    ${response.status_code}
-    log to console    ${response.content}
-
-
-    ${json_response}    to json   ${response.content}
-#    ${response.status}=    get value from json    ${json_response}    $.status
+    ${response_string}     convert to string    ${response}
+    should contain    ${response_string}   422
 
 Post_test_validation
     ${auth}=    create list    codemonster    my5ecret-key2o2o
@@ -173,11 +164,13 @@ Post_test_validation
 
     create session  mysession   ${base_url}    auth=${auth}
 
-    ${response}=    POST On Session    mysession    /payment_transactions   data=${body_json}    headers=${header}
+    ${response}=    run keyword and ignore error    POST On Session    mysession    /payment_transactions   data=${body_json}    headers=${header}
 
     #log to console    ${response.status_code}
-    log to console    ${response.content}
+    #log to console    ${response}
+    ${response_string}     convert to string    ${response}
+    should contain    ${response_string}   422
 
 
-    ${json_response}    to json   ${response.content}
+#    ${json_response}    to json   ${response.content}
 #    ${response.status}=    get value from json    ${json_response}    $.status
