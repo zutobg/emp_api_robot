@@ -41,14 +41,18 @@ Build with:
 `pip3 install jsonpath_rw_ext`
 
 
-### Run from console
+### How to execute from console
 
-run all tests:`robot sanity/api_tests.robot`
+Go into the API project main folder
 
-run Smoke:`robot -d results -i Smoke sanity/api_tests.robot`
+Clone this repo
 
-run Sanity:`robot -d results -i Sanity sanity/api_tests.robot`
+run all tests:`robot emp_api_robot/robot-tests/sanity/api_tests.robot`
 
-run Validation:`robot -d results -i Validation sanity/api_tests.robot`
+run Smoke:`robot -d results -i Smoke emp_api_robot/robot-tests/sanity/api_tests.robot`
 
-runn all but Smoke:`robot -d results -e Smoke sanity/api_tests.robot`
+run Sanity:`robot -d results -i Sanity emp_api_robot/robot-tests/sanity/api_tests.robot`
+
+run Validation:`robot -d results -i Validation emp_api_robot/robot-tests/sanity/api_tests.robot`
+
+runn all but Smoke:`robot -d results -e Smoke emp_api_robot/robot-tests/sanity/api_tests.robot`
