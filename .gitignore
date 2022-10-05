@@ -26,3 +26,18 @@
 config/settings.local.yml
 config/settings/*.local.yml
 config/environments/*.local.yml
+
+# Ignore robot framewok IDE
+/robot-tests/.idea
+/robot-tests/bin
+/robot-tests/lib
+/robot-tests/pyvenv.cfg
+
+# Ignore robot logs and reports
+robot-tests/log.html
+robot-tests/output.xml
+robot-tests/report.html
+robot-tests/results/
+
+# Ignore Python files
+robot-tests/sanity/__pycache__/

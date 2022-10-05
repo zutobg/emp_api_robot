@@ -1,0 +1,62 @@
+I'll use this to write my tests in gherking before i implement them in robot framework
+
+try with missing header
+try with missing/wrong auth
+
+
+status codes:
+200
+201
+etc
+
+"status": 500,
+    "error": "Internal Server Error",
+    "exception": "#<ActiveModel::RangeError: 500000000000 is out of range for ActiveRecord::ConnectionAdapters::SQLite3Adapter::SQLite3Integer with limit 4 bytes>"
+
+{
+    "amount": [
+        "must be greater than 0"
+    ]
+}
+
+
+{
+    "amount": [
+        "must be an integer"
+    ]
+}
+
+
+"email": [
+        "is invalid"
+    ]
+
+
+{
+    "card_holder": [
+        "can't be blank"
+    ]
+}
+
+
+{
+    "address": [
+        "can't be blank"
+    ]
+}
+
+
+"expiration_date": "13/20192",
+
+
+
+
+"transaction_type": "sal",
+{
+    "transaction_type": [
+        "is not included in the list"
+    ],
+    "reference_id": [
+        "Invalid reference transaction!"
+    ]
+}
