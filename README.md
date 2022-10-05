@@ -43,6 +43,15 @@ Build with:
 
 ### How to execute from console
 
+Add to main Ruby project gitignore
+
+```
+log.html
+output.xml
+report.html
+results/
+```
+
 Go into the API project main folder
 
 Clone this repo
